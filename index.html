@@ -17,10 +17,8 @@
   :root{--bg:#F5F6FA;--marca:#2D1B44;--destaque:#FC7255}
   @media (prefers-color-scheme: dark){:root{--bg:#0B0F15}}
   html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;overscroll-behavior:none}
-  #app{position:fixed;left:env(safe-area-inset-left,0px);right:env(safe-area-inset-right,0px);
-    top:env(safe-area-inset-top,0px);bottom:env(safe-area-inset-bottom,0px);
-    width:calc(100% - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px));
-    height:calc(100% - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));border:0;display:block;background:var(--bg)}
+  #app{position:fixed;inset:0;width:100%;height:100%;border:0;display:block;background:var(--bg)}
+  #medida{position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
   #abertura{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
     background:var(--marca);color:#fff;font:600 17px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;transition:opacity .35s}
   #abertura.some{opacity:0;pointer-events:none}
@@ -43,6 +41,7 @@
   <small class="carregando">Abrindo…</small>
   <div id="semRede"><div>Sem internet</div><small>Confira a conexão e tente de novo.</small><br><button id="denovo">Tentar de novo</button></div>
 </div>
+<div id="medida"></div>
 <iframe id="app" title="Cofrinho a Dois" allow="clipboard-write; microphone; camera"></iframe>
 <script>
   // O app de verdade (Apps Script). Esta página só dá a ele ícone, tela cheia e tela de abertura no celular.
@@ -62,6 +61,9 @@
     if (d.bg) { document.documentElement.style.setProperty('--bg', d.bg);
       document.querySelectorAll('meta[name=theme-color]').forEach(function(m){ m.setAttribute('content', d.bg); }); }
     if (d.pronto) mostrarApp();
+    // o app ocupa a tela toda; contamos a ele o tamanho do relógio (em cima) e da barrinha (embaixo) do iPhone
+    try { var cs = getComputedStyle(document.getElementById('medida'));
+      e.source.postMessage({cofrinho:'margens', top:parseFloat(cs.paddingTop)||0, bottom:parseFloat(cs.paddingBottom)||0}, '*'); } catch (err) {}
   });
   frame.addEventListener('load', function(){ setTimeout(mostrarApp, 2500); });
   document.getElementById('denovo').addEventListener('click', carregar);
